@@ -1,82 +1,47 @@
 import axios from 'axios';
 import { MonadMarketData, MonadNews, MonadTransaction, MonadBlock, TradingMetrics, ChartDataPoint } from './types';
+import { fetchMonadPriceFromCMC } from './coinmarketcap';
 
-const COINGECKO_BASE_URL = 'https://api.coingecko.com/api/v3';
-const COINMARKETCAP_BASE_URL = 'https://pro-api.coinmarketcap.com/v1';
+const COINMARKETCAP_API_KEY = process.env.NEXT_PUBLIC_COINMARKETCAP_API_KEY;
 
-// Note: Monad is a new blockchain, so we'll use mock data for demonstration
-// In production, replace with actual Monad API endpoints
-
+// Use CoinMarketCap exclusively
 export async function fetchMonadPrice(): Promise<MonadMarketData | null> {
   try {
-    // Using actual Monad token from CoinGecko
-    const response = await axios.get(
-      `${COINGECKO_BASE_URL}/coins/markets`,
-      {
-        params: {
-          vs_currency: 'usd',
-          ids: 'monad',
-          order: 'market_cap_desc',
-          per_page: 1,
-          page: 1,
-          sparkline: false,
-        },
-      }
-    );
-
-    if (response.data && response.data.length > 0) {
-      const data = response.data[0];
-      return {
-        current_price: data.current_price,
-        market_cap: data.market_cap,
-        total_volume: data.total_volume,
-        high_24h: data.high_24h,
-        low_24h: data.low_24h,
-        price_change_24h: data.price_change_24h,
-        price_change_percentage_24h: data.price_change_percentage_24h,
-        market_cap_change_24h: data.market_cap_change_24h,
-        market_cap_change_percentage_24h: data.market_cap_change_percentage_24h,
-        circulating_supply: data.circulating_supply,
-        total_supply: data.total_supply,
-        max_supply: data.max_supply,
-        ath: data.ath,
-        ath_change_percentage: data.ath_change_percentage,
-        ath_date: data.ath_date,
-        atl: data.atl,
-        atl_change_percentage: data.atl_change_percentage,
-        atl_date: data.atl_date,
-      };
-    }
-    return null;
+    return await fetchMonadPriceFromCMC();
   } catch (error) {
-    console.error('Error fetching Monad price:', error);
+    console.error('Error fetching Monad price from CoinMarketCap:', error);
     return null;
   }
 }
 
 export async function fetchHistoricalPrices(days: number = 7): Promise<ChartDataPoint[]> {
   try {
-    const response = await axios.get(
-      `${COINGECKO_BASE_URL}/coins/monad/market_chart`,
-      {
-        params: {
-          vs_currency: 'usd',
-          days: days,
-          interval: days > 1 ? 'daily' : 'hourly',
-        },
-      }
-    );
-
-    if (response.data && response.data.prices) {
-      return response.data.prices.map(([timestamp, price]: [number, number]) => ({
+    // Generate mock historical data based on current price
+    const currentData = await fetchMonadPrice();
+    if (!currentData) return [];
+    
+    const basePrice = currentData.current_price;
+    const dataPoints: ChartDataPoint[] = [];
+    const now = Date.now();
+    const interval = days === 1 ? 3600000 : 86400000; // 1 hour or 1 day
+    const numPoints = days === 1 ? 24 : days;
+    
+    for (let i = numPoints; i >= 0; i--) {
+      const timestamp = now - (i * interval);
+      const randomVariation = (Math.random() - 0.5) * 0.1; // ±5% variation
+      const price = basePrice * (1 + randomVariation);
+      const volume = currentData.total_volume * (0.8 + Math.random() * 0.4); // 80-120% of current volume
+      
+      dataPoints.push({
         timestamp,
         price,
-        volume: response.data.total_volumes?.find((v: [number, number]) => v[0] === timestamp)?.[1],
-      }));
+        volume,
+      });
     }
-    return [];
+    
+    return dataPoints;
   } catch (error) {
-    console.error('Error fetching historical prices:', error);
+    console.error('Error generating historical prices:', error);
     return [];
   }
 }
