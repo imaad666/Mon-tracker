@@ -14,7 +14,7 @@ import {
   Filler,
 } from 'chart.js';
 import { ChartDataPoint } from '@/lib/types';
-import { BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
 
 ChartJS.register(
   CategoryScale,
@@ -59,21 +59,32 @@ export default function PriceChart() {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
+  // Calculate price change
+  const priceChange = chartData.length > 1 
+    ? ((chartData[chartData.length - 1].price - chartData[0].price) / chartData[0].price) * 100
+    : 0;
+  const isPositive = priceChange >= 0;
+
   const chartConfig = {
     labels: chartData.map(d => formatDate(d.timestamp)),
     datasets: [
       {
         label: 'Price (USD)',
         data: chartData.map(d => d.price),
-        borderColor: 'rgb(147, 51, 234)',
-        backgroundColor: 'rgba(147, 51, 234, 0.1)',
+        borderColor: isPositive 
+          ? 'rgba(34, 197, 94, 1)' 
+          : 'rgba(239, 68, 68, 1)',
+        backgroundColor: isPositive
+          ? 'rgba(34, 197, 94, 0.1)'
+          : 'rgba(239, 68, 68, 0.1)',
         fill: true,
         tension: 0.4,
         pointRadius: 0,
-        pointHoverRadius: 6,
-        pointHoverBackgroundColor: 'rgb(147, 51, 234)',
+        pointHoverRadius: 8,
+        pointHoverBackgroundColor: isPositive ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)',
         pointHoverBorderColor: 'white',
-        pointHoverBorderWidth: 2,
+        pointHoverBorderWidth: 3,
+        borderWidth: 3,
       },
     ],
   };
@@ -88,16 +99,24 @@ export default function PriceChart() {
       tooltip: {
         mode: 'index' as const,
         intersect: false,
-        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+        backgroundColor: 'rgba(15, 23, 42, 0.95)',
         titleColor: 'white',
         bodyColor: 'white',
-        borderColor: 'rgb(147, 51, 234)',
-        borderWidth: 1,
-        padding: 12,
+        borderColor: isPositive ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)',
+        borderWidth: 2,
+        padding: 16,
         displayColors: false,
+        titleFont: {
+          size: 14,
+          weight: 'bold' as const,
+        },
+        bodyFont: {
+          size: 16,
+          weight: 'bold' as const,
+        },
         callbacks: {
           label: function(context: any) {
-            return `$${context.parsed.y.toFixed(2)}`;
+            return `$${context.parsed.y.toFixed(6)}`;
           }
         }
       },
@@ -106,23 +125,35 @@ export default function PriceChart() {
       x: {
         grid: {
           display: false,
-          color: 'rgba(255, 255, 255, 0.1)',
         },
         ticks: {
-          color: 'rgba(255, 255, 255, 0.6)',
+          color: 'rgba(255, 255, 255, 0.5)',
           maxTicksLimit: 8,
+          font: {
+            size: 11,
+          }
         },
+        border: {
+          display: false,
+        }
       },
       y: {
         grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
+          color: 'rgba(255, 255, 255, 0.05)',
+          drawBorder: false,
         },
         ticks: {
-          color: 'rgba(255, 255, 255, 0.6)',
+          color: 'rgba(255, 255, 255, 0.5)',
           callback: function(value: any) {
-            return '$' + value.toFixed(2);
+            return '$' + value.toFixed(6);
+          },
+          font: {
+            size: 11,
           }
         },
+        border: {
+          display: false,
+        }
       },
     },
     interaction: {
@@ -140,21 +171,40 @@ export default function PriceChart() {
   ];
 
   return (
-    <div className="bg-gray-800 rounded-lg p-6 shadow-xl border border-gray-700">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-purple-400" />
-          <h3 className="text-xl font-bold text-white">Price Chart</h3>
+    <div className="glass-card p-6 h-full">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg">
+              <Activity className="w-5 h-5 text-purple-400" />
+            </div>
+            <h3 className="text-2xl font-bold text-white">Price Chart</h3>
+          </div>
+          {chartData.length > 0 && (
+            <div className="flex items-center gap-2 ml-11">
+              {isPositive ? (
+                <TrendingUp className="w-5 h-5 text-green-400" />
+              ) : (
+                <TrendingDown className="w-5 h-5 text-red-400" />
+              )}
+              <span className={`text-lg font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                {isPositive ? '+' : ''}{priceChange.toFixed(2)}%
+              </span>
+              <span className="text-gray-400 text-sm">
+                {timeFrame === '1' ? 'Last 24 hours' : `Last ${timeFrame} days`}
+              </span>
+            </div>
+          )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {timeFrames.map(({ value, label }) => (
             <button
               key={value}
               onClick={() => setTimeFrame(value)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+              className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                 timeFrame === value
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/50'
+                  : 'glass-card text-gray-300 hover:bg-white/10'
               }`}
             >
               {label}
@@ -163,16 +213,24 @@ export default function PriceChart() {
         </div>
       </div>
 
-      <div className="h-80">
+      <div className="h-96 relative">
         {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+          <div className="flex flex-col items-center justify-center h-full gap-4">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500/20 border-t-purple-500"></div>
+              <div className="absolute inset-0 animate-ping rounded-full h-16 w-16 border-4 border-purple-500/20"></div>
+            </div>
+            <p className="text-gray-400 font-medium">Loading chart data...</p>
           </div>
         ) : chartData.length > 0 ? (
-          <Line data={chartConfig} options={options} />
+          <div className="h-full relative">
+            <div className="absolute inset-0 bg-gradient-to-t from-purple-500/5 to-transparent rounded-xl pointer-events-none"></div>
+            <Line data={chartConfig} options={options} />
+          </div>
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-400">
-            No chart data available
+          <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-3">
+            <Activity className="w-12 h-12 opacity-50" />
+            <p className="font-medium">No chart data available</p>
           </div>
         )}
       </div>
