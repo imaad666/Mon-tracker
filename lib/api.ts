@@ -9,14 +9,13 @@ const COINMARKETCAP_BASE_URL = 'https://pro-api.coinmarketcap.com/v1';
 
 export async function fetchMonadPrice(): Promise<MonadMarketData | null> {
   try {
-    // For demonstration, using a similar token structure
-    // Replace 'monad' with actual CoinGecko ID when available
+    // Using actual Monad token from CoinGecko
     const response = await axios.get(
       `${COINGECKO_BASE_URL}/coins/markets`,
       {
         params: {
           vs_currency: 'usd',
-          ids: 'ethereum', // Replace with 'monad' when available
+          ids: 'monad',
           order: 'market_cap_desc',
           per_page: 1,
           page: 1,
@@ -58,7 +57,7 @@ export async function fetchMonadPrice(): Promise<MonadMarketData | null> {
 export async function fetchHistoricalPrices(days: number = 7): Promise<ChartDataPoint[]> {
   try {
     const response = await axios.get(
-      `${COINGECKO_BASE_URL}/coins/ethereum/market_chart`, // Replace with monad
+      `${COINGECKO_BASE_URL}/coins/monad/market_chart`,
       {
         params: {
           vs_currency: 'usd',
