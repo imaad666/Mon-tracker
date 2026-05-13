@@ -1,0 +1,14 @@
+{
+  "name": "monad-tracker",
+  "version": "1.0.0",
+  "description": "Monad (MON) cryptocurrency tracker - Did MON hit the MOON?",
+  "main": "index.html",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "keywords": ["monad", "cryptocurrency", "tracker", "MON"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
