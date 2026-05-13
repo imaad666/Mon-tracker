@@ -6,6 +6,21 @@ const path = require('path');
 const CMC_API_KEY = '12426ee8471941898435fd3d7ffc11b9';
 const PORT = 3000;
 
+// MIME types for different file extensions
+const mimeTypes = {
+  '.html': 'text/html',
+  '.css': 'text/css',
+  '.js': 'text/javascript',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.pdf': 'application/pdf'
+};
+
 const server = http.createServer((req, res) => {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,31 +33,9 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Serve HTML files
-  if (req.url === '/' || req.url === '/index.html') {
-    fs.readFile('index.html', (err, data) => {
-      if (err) {
-        res.writeHead(500);
-        res.end('Error loading index.html');
-        return;
-      }
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(data);
-    });
-    return;
-  }
-
-  if (req.url === '/test-chart.html') {
-    fs.readFile('test-chart.html', (err, data) => {
-      if (err) {
-        res.writeHead(500);
-        res.end('Error loading test-chart.html');
-        return;
-      }
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(data);
-    });
-    return;
+  // Serve root as index.html
+  if (req.url === '/') {
+    req.url = '/index.html';
   }
 
   // Proxy CoinMarketCap API
@@ -79,9 +72,25 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // 404
-  res.writeHead(404);
-  res.end('Not found');
+  // Serve static files
+  const filePath = path.join(__dirname, decodeURIComponent(req.url));
+  const extname = path.extname(filePath).toLowerCase();
+  const contentType = mimeTypes[extname] || 'application/octet-stream';
+
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        res.writeHead(404);
+        res.end('File not found');
+      } else {
+        res.writeHead(500);
+        res.end('Server error: ' + err.code);
+      }
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.end(data);
+  });
 });
 
 server.listen(PORT, () => {

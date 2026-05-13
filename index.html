@@ -16,11 +16,11 @@
             --monad-purple: #8247E5;
             --monad-purple-light: #9D6EF2;
             --monad-purple-dark: #6B38C7;
-            --monad-bg: #0A0A0F;
-            --monad-bg-secondary: #13131A;
-            --monad-border: #1F1F2E;
-            --monad-text: #FFFFFF;
-            --monad-text-secondary: #9CA3AF;
+            --monad-bg: #F8F7FF;
+            --monad-bg-secondary: #FFFFFF;
+            --monad-border: #E5E1FF;
+            --monad-text: #1A1A1A;
+            --monad-text-secondary: #6B6B6B;
             --monad-success: #10B981;
             --monad-error: #EF4444;
         }
@@ -133,7 +133,6 @@
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            box-shadow: 0 0 30px rgba(130, 71, 229, 0.4);
         }
 
         .coin-info h1 {
@@ -161,15 +160,146 @@
 
         .price-section {
             display: flex;
-            align-items: baseline;
-            gap: 20px;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
             margin-bottom: 32px;
-            flex-wrap: wrap;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         .price-main {
+            font-family: 'Roboto Mono', monospace;
             font-size: 56px;
             font-weight: 700;
+            color: #1A1A1A;
+            animation: price-pulse 3s ease-in-out infinite;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 1px rgba(110, 84, 255, 0.3));
+        }
+
+        .price-main.flash-green {
+            animation: flash-green 0.8s ease-out forwards;
+        }
+
+        .price-main.flash-red {
+            animation: flash-red 0.8s ease-out forwards;
+        }
+
+
+        .moon-tracker {
+            margin-top: 40px;
+            padding: 32px;
+            background: linear-gradient(135deg, rgba(110, 84, 255, 0.05), rgba(130, 71, 229, 0.05));
+            border: 2px solid rgba(110, 84, 255, 0.2);
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .moon-question {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 16px;
+        }
+
+        .moon-status {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .moon-status.close {
+            color: #6E54FF;
+        }
+
+        .moon-status.yes {
+            color: #10B981;
+            font-size: 36px;
+        }
+
+        .moon-distance {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 18px;
+            color: #6B6B6B;
+        }
+
+        .moon-distance .amount {
+            color: #6E54FF;
+            font-weight: 700;
+        }
+
+
+        @keyframes price-pulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 8px rgba(110, 84, 255, 0.4))
+                        drop-shadow(0 0 15px rgba(110, 84, 255, 0.3))
+                        drop-shadow(0 0 25px rgba(110, 84, 255, 0.2));
+            }
+            50% {
+                filter: drop-shadow(0 0 12px rgba(110, 84, 255, 0.6))
+                        drop-shadow(0 0 25px rgba(110, 84, 255, 0.5))
+                        drop-shadow(0 0 40px rgba(110, 84, 255, 0.3));
+            }
+        }
+
+        @keyframes flash-green {
+            0% {
+                color: #10B981;
+                filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.8))
+                        drop-shadow(0 0 30px rgba(16, 185, 129, 0.6))
+                        drop-shadow(0 0 50px rgba(16, 185, 129, 0.4));
+            }
+            15% {
+                color: #1A1A1A;
+                filter: drop-shadow(0 0 8px rgba(110, 84, 255, 0.4))
+                        drop-shadow(0 0 15px rgba(110, 84, 255, 0.3))
+                        drop-shadow(0 0 25px rgba(110, 84, 255, 0.2));
+            }
+            30% {
+                color: #10B981;
+                filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.8))
+                        drop-shadow(0 0 30px rgba(16, 185, 129, 0.6))
+                        drop-shadow(0 0 50px rgba(16, 185, 129, 0.4));
+            }
+            100% {
+                color: #1A1A1A;
+                filter: drop-shadow(0 0 8px rgba(110, 84, 255, 0.4))
+                        drop-shadow(0 0 15px rgba(110, 84, 255, 0.3))
+                        drop-shadow(0 0 25px rgba(110, 84, 255, 0.2));
+            }
+        }
+
+        @keyframes flash-red {
+            0% {
+                color: #EF4444;
+                filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.8))
+                        drop-shadow(0 0 30px rgba(239, 68, 68, 0.6))
+                        drop-shadow(0 0 50px rgba(239, 68, 68, 0.4));
+            }
+            15% {
+                color: #1A1A1A;
+                filter: drop-shadow(0 0 8px rgba(110, 84, 255, 0.4))
+                        drop-shadow(0 0 15px rgba(110, 84, 255, 0.3))
+                        drop-shadow(0 0 25px rgba(110, 84, 255, 0.2));
+            }
+            30% {
+                color: #EF4444;
+                filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.8))
+                        drop-shadow(0 0 30px rgba(239, 68, 68, 0.6))
+                        drop-shadow(0 0 50px rgba(239, 68, 68, 0.4));
+            }
+            100% {
+                color: #1A1A1A;
+                filter: drop-shadow(0 0 8px rgba(110, 84, 255, 0.4))
+                        drop-shadow(0 0 15px rgba(110, 84, 255, 0.3))
+                        drop-shadow(0 0 25px rgba(110, 84, 255, 0.2));
+            }
         }
 
         .price-change {
@@ -515,9 +645,9 @@
             <div class="chart-header">
                 <h2 class="chart-title">Price Chart</h2>
                 <div class="timeframe-tabs">
-                    <button class="timeframe-btn active" onclick="changeTimeframe(7)">7D</button>
+                    <button class="timeframe-btn" onclick="changeTimeframe(7)">7D</button>
                     <button class="timeframe-btn" onclick="changeTimeframe(30)">30D</button>
-                    <button class="timeframe-btn" onclick="changeTimeframe(90)">90D</button>
+                    <button class="timeframe-btn active" onclick="changeTimeframe(90)">90D</button>
                 </div>
             </div>
             <div class="chart-container">
@@ -526,6 +656,12 @@
         </div>
 
         <div id="marketStatsContainer" class="market-stats-container">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div id="moonTracker" class="moon-tracker">
             <div class="loading">
                 <div class="spinner"></div>
             </div>
@@ -539,8 +675,9 @@
 
     <script>
         let priceChart = null;
-        let currentTimeframe = 7;
+        let currentTimeframe = 90;
         let currentMarketPrice = null;
+        let previousPrice = null;
 
         function formatNumber(num) {
             if (num >= 1e9) return '$' + (num / 1e9).toFixed(2) + 'B';
@@ -579,16 +716,72 @@
             const quote = data.quote.USD;
             const change24h = quote.percent_change_24h;
             const isPositive = change24h >= 0;
-            currentMarketPrice = quote.price;
+            const newPrice = quote.price;
+
+            // Check if price changed
+            let flashClass = '';
+            if (previousPrice !== null && previousPrice !== newPrice) {
+                flashClass = newPrice > previousPrice ? 'flash-green' : 'flash-red';
+            }
+            
+            currentMarketPrice = newPrice;
+            previousPrice = newPrice;
 
             document.getElementById('rankBadge').textContent = `Rank #${data.cmc_rank}`;
             document.getElementById('priceSection').innerHTML = `
                 <div class="price-section">
-                    <div class="price-main">$${quote.price.toFixed(6)}</div>
-                    <div class="price-change ${isPositive ? 'up' : 'down'}">
-                        ${isPositive ? '↑' : '↓'} ${Math.abs(change24h).toFixed(2)}%
+                    <div class="price-row">
+                        <div class="price-main ${flashClass}">$${quote.price.toFixed(6)}</div>
+                        <div class="price-change ${isPositive ? 'up' : 'down'}">
+                            ${isPositive ? '↑' : '↓'} ${Math.abs(change24h).toFixed(2)}%
+                        </div>
                     </div>
                 </div>
+            `;
+
+            // Update moon tracker
+            updateMoonTracker(quote.price);
+
+            // Remove flash class after animation completes
+            if (flashClass) {
+                setTimeout(() => {
+                    const priceElement = document.querySelector('.price-main');
+                    if (priceElement) {
+                        priceElement.classList.remove('flash-green', 'flash-red');
+                    }
+                }, 600);
+            }
+        }
+
+        function updateMoonTracker(currentPrice) {
+            const moonTarget = 1.0;
+            const distance = moonTarget - currentPrice;
+            const percentToMoon = (currentPrice / moonTarget) * 100;
+
+            let status, statusClass, emoji, message;
+
+            if (currentPrice >= moonTarget) {
+                status = "YES! MON HIT THE MOON!";
+                statusClass = "yes";
+                message = "We made it! 🚀";
+            } else if (percentToMoon >= 90) {
+                status = "SO CLOSE!";
+                statusClass = "close";
+                message = `Getting there, <span class="amount">$${distance.toFixed(8)}</span> left`;
+            } else if (percentToMoon >= 50) {
+                status = "HALFWAY THERE!";
+                statusClass = "close";
+                message = `Getting there, <span class="amount">$${distance.toFixed(8)}</span> left`;
+            } else {
+                status = "GETTING THERE";
+                statusClass = "close";
+                message = `<span class="amount">$${distance.toFixed(8)}</span> left to reach $1.00`;
+            }
+
+            document.getElementById('moonTracker').innerHTML = `
+                <div class="moon-question">Did MON hit the MOON?</div>
+                <div class="moon-status ${statusClass}">${status}</div>
+                <div class="moon-distance">${message}</div>
             `;
         }
 
@@ -803,7 +996,11 @@
         }
 
         init();
+        // Auto-refresh every 30 seconds
         setInterval(updateAllData, 30000);
+        
+        // Log refresh status
+        console.log('🔄 Auto-refresh enabled: Updates every 30 seconds');
     </script>
 </body>
 </html>
