@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monad (MON) Price Tracker | Real-time Dashboard</title>
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <link rel="icon" type="image/svg+xml" href="Monad Brand and Media Kit/Logos/Logomark/Logomark.svg">
+    <link rel="alternate icon" type="image/png" href="Monad Brand and Media Kit/Logos/Logomark/Logomark.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -199,6 +202,119 @@
             margin-bottom: 32px;
         }
 
+        .stats-grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .market-stats-container {
+            margin-bottom: 32px;
+        }
+
+        .market-stats-top {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .market-stats-bottom {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid-5 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .market-stats-top {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid-5 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .market-stats-top {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .market-stats-bottom {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--monad-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .monad-logo-anim {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 18px;
+            color: var(--monad-purple-light);
+            letter-spacing: 0.1em;
+            animation: pulse-text 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-text {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: var(--monad-border);
+            border-radius: 2px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .loading-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--monad-purple), var(--monad-purple-light));
+            border-radius: 2px;
+            animation: loading 2s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
         .stat-card {
             background: var(--monad-bg-secondary);
             border: 1px solid var(--monad-border);
@@ -352,11 +468,19 @@
     </style>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <img class="monad-logo-anim" src="Monad Brand and Media Kit/Logos/Logomark/Logomark.svg" alt="Monad">
+        <div class="loading-text">LOADING MONAD TRACKER</div>
+        <div class="loading-bar">
+            <div class="loading-bar-fill"></div>
+        </div>
+    </div>
+
     <div class="header">
         <div class="header-content">
             <div class="logo">
-                <img class="logo-icon" src="https://s2.coinmarketcap.com/static/img/coins/64x64/30495.png" alt="Monad">
-                <span class="logo-text">Monad Tracker</span>
+                <img src="Monad Brand and Media Kit/Logos/Full Logo/Full Logo Default.svg" alt="Monad" style="height: 32px;">
             </div>
             <div class="live-badge">
                 <div class="live-dot"></div>
@@ -368,7 +492,7 @@
     <div class="container">
         <div class="coin-header">
             <div class="coin-title-row">
-                <img class="coin-logo-large" src="https://s2.coinmarketcap.com/static/img/coins/64x64/30495.png" alt="Monad">
+                <img class="coin-logo-large" src="Monad Brand and Media Kit/Logos/Logomark/Logomark.svg" alt="Monad">
                 <div class="coin-info">
                     <h1>Monad <span class="coin-symbol">MON</span></h1>
                 </div>
@@ -381,7 +505,7 @@
             <p>Loading price data...</p>
         </div>
 
-        <div id="statsGrid" class="stats-grid">
+        <div id="priceChangesGrid" class="stats-grid-5">
             <div class="loading">
                 <div class="spinner"></div>
             </div>
@@ -396,7 +520,15 @@
                     <button class="timeframe-btn" onclick="changeTimeframe(90)">90D</button>
                 </div>
             </div>
-            <div id="priceChart" class="chart-container"></div>
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+        </div>
+
+        <div id="marketStatsContainer" class="market-stats-container">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
         </div>
     </div>
 
@@ -406,8 +538,7 @@
     </div>
 
     <script>
-        let chart = null;
-        let lineSeries = null;
+        let priceChart = null;
         let currentTimeframe = 7;
         let currentMarketPrice = null;
 
@@ -465,39 +596,8 @@
             const quote = data.quote.USD;
             const marketCapChange = quote.market_cap_change_24h || 0;
             
-            document.getElementById('statsGrid').innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-label">Market Cap</div>
-                    <div class="stat-value">${formatNumber(quote.market_cap)}</div>
-                    <div class="stat-change ${marketCapChange >= 0 ? 'up' : 'down'}">
-                        ${marketCapChange >= 0 ? '↑' : '↓'} ${Math.abs(marketCapChange).toFixed(2)}% (24h)
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">24h Volume</div>
-                    <div class="stat-value">${formatNumber(quote.volume_24h)}</div>
-                    <div class="stat-change neutral">${data.num_market_pairs} markets</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Circulating Supply</div>
-                    <div class="stat-value">${(data.circulating_supply / 1e9).toFixed(2)}B</div>
-                    <div class="stat-change neutral">MON tokens</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Total Supply</div>
-                    <div class="stat-value">${(data.total_supply / 1e9).toFixed(2)}B</div>
-                    <div class="stat-change neutral">MON tokens</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Fully Diluted Market Cap</div>
-                    <div class="stat-value">${formatNumber(quote.fully_diluted_market_cap)}</div>
-                    <div class="stat-change neutral">FDV</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Volume/Market Cap</div>
-                    <div class="stat-value">${(quote.volume_24h / quote.market_cap * 100).toFixed(2)}%</div>
-                    <div class="stat-change neutral">Liquidity</div>
-                </div>
+            // Price changes above chart (5 cards)
+            document.getElementById('priceChangesGrid').innerHTML = `
                 <div class="stat-card">
                     <div class="stat-label">1 Hour Change</div>
                     <div class="stat-value">${quote.percent_change_1h >= 0 ? '+' : ''}${quote.percent_change_1h.toFixed(2)}%</div>
@@ -523,84 +623,147 @@
                     <div class="stat-value">${quote.percent_change_90d >= 0 ? '+' : ''}${quote.percent_change_90d.toFixed(2)}%</div>
                     <div class="stat-change ${quote.percent_change_90d >= 0 ? 'up' : 'down'}">Last 90 days</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Market Dominance</div>
-                    <div class="stat-value">${quote.market_cap_dominance.toFixed(4)}%</div>
-                    <div class="stat-change neutral">Of crypto market</div>
+            `;
+            
+            // Market stats below chart - split into top row (5 cards) and bottom row (2 cards)
+            document.getElementById('marketStatsContainer').innerHTML = `
+                <div class="market-stats-top">
+                    <div class="stat-card">
+                        <div class="stat-label">Market Cap</div>
+                        <div class="stat-value">${formatNumber(quote.market_cap)}</div>
+                        <div class="stat-change ${marketCapChange >= 0 ? 'up' : 'down'}">
+                            ${marketCapChange >= 0 ? '↑' : '↓'} ${Math.abs(marketCapChange).toFixed(2)}% (24h)
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">24h Volume</div>
+                        <div class="stat-value">${formatNumber(quote.volume_24h)}</div>
+                        <div class="stat-change neutral">${data.num_market_pairs} markets</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Circulating Supply</div>
+                        <div class="stat-value">${(data.circulating_supply / 1e9).toFixed(2)}B</div>
+                        <div class="stat-change neutral">MON tokens</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Supply</div>
+                        <div class="stat-value">${(data.total_supply / 1e9).toFixed(2)}B</div>
+                        <div class="stat-change neutral">MON tokens</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Fully Diluted Market Cap</div>
+                        <div class="stat-value">${formatNumber(quote.fully_diluted_market_cap)}</div>
+                        <div class="stat-change neutral">FDV</div>
+                    </div>
+                </div>
+                <div class="market-stats-bottom">
+                    <div class="stat-card">
+                        <div class="stat-label">Volume/Market Cap</div>
+                        <div class="stat-value">${(quote.volume_24h / quote.market_cap * 100).toFixed(2)}%</div>
+                        <div class="stat-change neutral">Liquidity</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Market Dominance</div>
+                        <div class="stat-value">${quote.market_cap_dominance.toFixed(4)}%</div>
+                        <div class="stat-change neutral">Of crypto market</div>
+                    </div>
                 </div>
             `;
         }
 
         async function updateChart(days = 7) {
             const historicalData = await fetchHistoricalData(days);
-            if (historicalData.length === 0) {
-                console.error('No historical data available');
-                return;
-            }
+            if (historicalData.length === 0) return;
 
-            const refPrice = currentMarketPrice || historicalData[historicalData.length - 1].close;
-            console.log('Updating chart with', historicalData.length, 'data points, baseline:', refPrice);
+            const labels = historicalData.map(d => {
+                const date = new Date(d.time * 1000);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
 
-            // Prepare data for TradingView chart
-            const chartData = historicalData.map(d => ({
-                time: d.time,
-                value: d.close
-            }));
+            const prices = historicalData.map(d => d.close);
+            const refPrice = currentMarketPrice || prices[prices.length - 1];
 
-            // Create chart if it doesn't exist
-            if (!chart) {
-                chart = LightweightCharts.createChart(document.getElementById('priceChart'), {
-                    width: document.getElementById('priceChart').clientWidth,
-                    height: 450,
-                    layout: {
-                        background: { color: '#13131A' },
-                        textColor: '#9CA3AF',
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            if (priceChart) priceChart.destroy();
+
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Price (USD)',
+                        data: prices,
+                        borderColor: '#8247E5',
+                        backgroundColor: 'rgba(130, 71, 229, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#8247E5',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: '#0A0A0F',
+                            titleColor: '#9CA3AF',
+                            bodyColor: '#FFFFFF',
+                            borderColor: '#8247E5',
+                            borderWidth: 2,
+                            padding: 16,
+                            displayColors: false,
+                            callbacks: {
+                                label: (context) => 'Price: $' + context.parsed.y.toFixed(6)
+                            }
+                        },
+                        annotation: {
+                            annotations: {
+                                currentPriceLine: {
+                                    type: 'line',
+                                    yMin: refPrice,
+                                    yMax: refPrice,
+                                    borderColor: '#8247E5',
+                                    borderWidth: 2,
+                                    borderDash: [5, 5],
+                                    label: {
+                                        display: true,
+                                        content: 'Current: $' + refPrice.toFixed(6),
+                                        position: 'end',
+                                        backgroundColor: '#8247E5',
+                                        color: '#FFFFFF',
+                                        font: {
+                                            size: 11,
+                                            weight: 'bold'
+                                        },
+                                        padding: 6
+                                    }
+                                }
+                            }
+                        }
                     },
-                    grid: {
-                        vertLines: { color: '#1F1F2E' },
-                        horzLines: { color: '#1F1F2E' },
-                    },
-                    crosshair: {
-                        mode: LightweightCharts.CrosshairMode.Normal,
-                    },
-                    rightPriceScale: {
-                        borderColor: '#1F1F2E',
-                    },
-                    timeScale: {
-                        borderColor: '#1F1F2E',
-                        timeVisible: true,
-                    },
-                });
-
-                lineSeries = chart.addBaselineSeries({
-                    baseValue: { type: 'price', price: refPrice },
-                    topLineColor: '#10B981',
-                    topFillColor1: 'rgba(16, 185, 129, 0.28)',
-                    topFillColor2: 'rgba(16, 185, 129, 0.05)',
-                    bottomLineColor: '#EF4444',
-                    bottomFillColor1: 'rgba(239, 68, 68, 0.05)',
-                    bottomFillColor2: 'rgba(239, 68, 68, 0.28)',
-                    lineWidth: 2,
-                });
-
-                // Handle resize
-                window.addEventListener('resize', () => {
-                    chart.applyOptions({ width: document.getElementById('priceChart').clientWidth });
-                });
-            } else {
-                // Update baseline
-                lineSeries.applyOptions({
-                    baseValue: { type: 'price', price: refPrice },
-                });
-            }
-
-            try {
-                lineSeries.setData(chartData);
-                chart.timeScale().fitContent();
-                console.log('Chart updated successfully with', chartData.length, 'data points');
-            } catch (error) {
-                console.error('Error setting chart data:', error);
-            }
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#9CA3AF', maxTicksLimit: 10 }
+                        },
+                        y: {
+                            grid: { color: '#1F1F2E' },
+                            ticks: {
+                                color: '#9CA3AF',
+                                callback: (value) => '$' + value.toFixed(6)
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function changeTimeframe(days) {
@@ -621,8 +784,25 @@
             }
         }
 
+        // Hide loading screen after data loads
+        function hideLoadingScreen() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }, 1500); // Show for at least 1.5 seconds
+        }
+
         // Initialize
-        updateAllData();
+        async function init() {
+            await updateAllData();
+            await updateChart(currentTimeframe);
+            hideLoadingScreen();
+        }
+
+        init();
         setInterval(updateAllData, 30000);
     </script>
 </body>
