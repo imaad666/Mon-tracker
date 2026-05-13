@@ -1,19 +1,9 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "api/cmc.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/cmc",
-      "dest": "/api/cmc.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/api/cmc",
+      "destination": "/api/cmc.js"
     }
   ]
 }
